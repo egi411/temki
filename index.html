@@ -1,0 +1,199 @@
+<title>Мои темки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F1F1EF;
+  --card:#FFFFFF;
+  --tint:#EAF6EC;
+  --line:#E4E4E0;
+  --ink:#1C1C1A;
+  --ink-2:#6B6B66;
+  --ink-3:#9A9A94;
+  --gain:#2E7D53;
+  --loss:#B4472A;
+  --spark:#D9A441;
+  --spark-fill:#F4E3BE;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 20px 64px}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+.sub{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+
+/* totals */
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:22px 0 28px}
+.t{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+.t .k{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+.t .v{font-size:21px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
+.t .v.gain{color:var(--gain)}
+
+/* cards */
+.cards{columns:4 250px;column-gap:14px}
+.c{break-inside:avoid;background:var(--card);border:1px solid var(--line);border-radius:10px;
+   padding:14px 15px 13px;margin:0 0 14px;box-shadow:0 1px 2px rgba(28,28,26,.04)}
+.c.tint{background:var(--tint);border-color:#D6E8DA}
+.hd{display:flex;align-items:center;gap:7px}
+.hd h3{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em;flex:1}
+.ic{font-size:15px;line-height:1}
+.badge{font-size:11px;font-weight:500;color:var(--gain);background:#DFF0E4;
+  border-radius:999px;padding:2px 7px;white-space:nowrap}
+.badge.zero{color:var(--ink-2);background:#EDEDEA}
+.badge.dead{color:var(--loss);background:#F6E0D8}
+.d{margin:6px 0 0;font-size:13px;color:var(--ink-2)}
+.chart{margin-top:10px}
+svg{display:block;width:100%;height:auto}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:11px;padding-top:9px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--ink-2)}
+.c.tint .meta{border-top-color:#D6E8DA}
+.meta b{font-weight:600;color:var(--ink)}
+.meta b.gain{color:var(--gain)}
+.meta b.loss{color:var(--loss)}
+
+/* findings */
+.findings{margin-top:16px}
+.findings h2{font-size:15px;font-weight:600;margin:0 0 10px}
+.fl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.f{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+.f .big{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.f p{margin:5px 0 0;font-size:13px;color:var(--ink-2)}
+.f p b{color:var(--ink);font-weight:600}
+
+footer{margin-top:26px;color:var(--ink-3);font-size:12px}
+footer b{color:var(--ink-2);font-weight:600}
+footer ul{margin:6px 0 0;padding-left:16px}
+footer li{margin:2px 0}
+</style>
+
+<div class="wrap">
+  <h1>Мои темки</h1>
+  <p class="sub">Шесть направлений с декабря 2022 по август 2026: сколько шло, сколько вложено, сколько осталось.</p>
+
+  <div class="totals" id="totals"></div>
+  <div class="cards" id="cards"></div>
+
+  <section class="findings">
+    <h2>Выводы</h2>
+    <div class="fl" id="findings"></div>
+  </section>
+
+  <footer>
+    <b>Как считалось</b>
+    <ul>
+      <li>Дизайн: 2 300 000 ₽ за 45 месяцев (дек 2022 — авг 2026), в среднем ≈51 000 ₽/мес.</li>
+      <li>SEO: $500/мес × 5 мес (фев — июн 2026) по курсу 80 ₽/$ + 60 000 ₽/мес с июля 2026 внутри VLAD BYKOV.</li>
+      <li>УБТ: 20 000 ₽ разнесены равномерно по май — июль 2025.</li>
+      <li>Часы не считались — учёта не было, время указано в календарных месяцах.</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+const F = n => new Intl.NumberFormat('ru-RU').format(Math.round(n));
+const RUB = n => (n<0?'−':'') + F(Math.abs(n)) + ' ₽';
+const MONTHS = 45;
+const idx = (y,m) => (y-2022)*12 + (m-1) - 11;
+const MN = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const label = i => { const t = 11+i; return MN[t%12] + ' ' + String(2022 + Math.floor(t/12)).slice(2); };
+const S = fn => { const a = new Array(MONTHS).fill(0); fn(a); return a; };
+
+const V = [
+  { ic:'🎨', name:'Дизайн и веб-дизайн', desc:'Основной поток все четыре года. Клиентский и продуктовый дизайн.',
+    from:[2022,12], to:[2026,8], invested:300000, status:'live',
+    rev: S(a => { for(let i=0;i<MONTHS;i++) a[i] = 2300000/45; }) },
+
+  { ic:'🔍', name:'SEO', desc:'Свои проекты плюс SEO внутри VLAD BYKOV. Сейчас стартую новую тему.',
+    from:[2025,12], to:[2026,8], invested:50000, status:'live',
+    rev: S(a => { for(let i=idx(2026,2);i<=idx(2026,6);i++) a[i]=40000;
+                  a[idx(2026,7)]=60000; a[idx(2026,8)]=60000; }) },
+
+  { ic:'🚀', name:'УБТ-трафик', desc:'Бесплатный трафик. Быстрый заход на три месяца, дальше не пошло.',
+    from:[2025,5], to:[2025,7], invested:3000, status:'done',
+    rev: S(a => { for(let i=idx(2025,5);i<=idx(2025,7);i++) a[i]=20000/3; }) },
+
+  { ic:'🛍️', name:'Shopify', desc:'Магазин на Shopify. Дохода не было ни рубля.',
+    from:[2024,10], to:[2025,1], invested:15000, status:'dead', rev: S(()=>{}) },
+
+  { ic:'🎮', name:'Пополнение Steam', desc:'Стартап на пополнении Steam. Закрылся без выручки.',
+    from:[2025,7], to:[2025,9], invested:5000, status:'dead', rev: S(()=>{}) },
+
+  { ic:'🤖', name:'Statrum', desc:'Стартап, собранный с ИИ. Денег не потребовал и не принёс.',
+    from:[2026,4], to:[2026,6], invested:0, status:'done', rev: S(()=>{}) },
+];
+
+V.forEach(v => {
+  v.earned = v.rev.reduce((s,x)=>s+x,0);
+  v.net = v.earned - v.invested;
+  v.i0 = idx(v.from[0],v.from[1]); v.i1 = idx(v.to[0],v.to[1]);
+  v.months = v.i1 - v.i0 + 1;
+  v.avg = v.earned / v.months;
+});
+
+const invested = V.reduce((s,v)=>s+v.invested,0);
+const earned   = V.reduce((s,v)=>s+v.earned,0);
+const net      = earned - invested;
+const pMonths  = V.reduce((s,v)=>s+v.months,0);
+
+document.getElementById('totals').innerHTML = [
+  ['Вложено', RUB(invested), ''],
+  ['Заработано', RUB(earned), ''],
+  ['Чистыми', RUB(net), 'gain'],
+  ['Отдача', '×' + (earned/invested).toFixed(1).replace('.',','), ''],
+  ['Проект-месяцев', F(pMonths), ''],
+].map(([k,v,c]) => `<div class="t"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join('');
+
+function chart(v){
+  if (v.earned === 0) return '';
+  const W=300,H=104,PL=40,PB=16,PT=4;
+  const d = v.rev.slice(v.i0, v.i1+1), n = d.length;
+  const max = Math.max(...d), iw = W-PL, ih = H-PB-PT;
+  const X = i => n===1 ? PL+iw/2 : PL + (i/(n-1))*iw;
+  const Y = x => PT + ih - (x/max)*(ih-6);
+  let area = `M ${PL} ${PT+ih}`; d.forEach((x,i)=> area += ` L ${X(i).toFixed(1)} ${Y(x).toFixed(1)}`);
+  area += ` L ${X(n-1).toFixed(1)} ${PT+ih} Z`;
+  let line=''; d.forEach((x,i)=> line += (i?' L ':'M ') + X(i).toFixed(1) + ' ' + Y(x).toFixed(1));
+  const ticks = [max, max/4].map(t =>
+    `<text x="${PL-6}" y="${Y(t)+3.5}" text-anchor="end" font-size="9" fill="var(--ink-3)">${F(t/1000)}к</text>`).join('');
+  const steps = n<=4 ? [...Array(n).keys()] : [0, Math.round((n-1)/2), n-1];
+  const xlab = steps.map(i =>
+    `<text x="${X(i).toFixed(1)}" y="${H-3}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="9" fill="var(--ink-3)">${label(v.i0+i)}</text>`).join('');
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Доход по месяцам">
+    <path d="${area}" fill="var(--spark-fill)"/>
+    <path d="${line}" fill="none" stroke="var(--spark)" stroke-width="1.6" stroke-linejoin="round"/>
+    ${ticks}${xlab}</svg></div>`;
+}
+
+document.getElementById('cards').innerHTML = V.map(v => {
+  const badge = v.earned ? `<span class="badge">${F(v.avg)} ₽/мес</span>`
+              : v.invested ? `<span class="badge dead">−${F(v.invested)} ₽</span>`
+              : `<span class="badge zero">0 ₽</span>`;
+  return `<article class="c${v.status==='live'?' tint':''}">
+    <div class="hd"><span class="ic">${v.ic}</span><h3>${v.name}</h3>${badge}</div>
+    <p class="d">${v.desc}</p>
+    ${chart(v)}
+    <div class="meta">
+      <span>${label(v.i0)} — ${v.status==='live'?'сейчас':label(v.i1)} · <b>${v.months} мес</b></span>
+      <span>вложено <b>${RUB(v.invested)}</b></span>
+      <span>чистыми <b class="${v.net>=0?'gain':'loss'}">${v.net>0?'+':''}${RUB(v.net)}</b></span>
+    </div>
+  </article>`;
+}).join('');
+
+const design = V[0], seo = V[1];
+document.getElementById('findings').innerHTML = [
+  [Math.round(design.earned/earned*100) + '%',
+   `всего дохода дала <b>одна</b> тема — дизайн. Остальные пять вместе принесли ${RUB(earned-design.earned)}.`],
+  ['30 000 ₽',
+   `в месяц чистыми уже даёт SEO — против ${RUB(design.net/design.months)} у дизайна, но за <b>9 месяцев вместо 45</b>. Окупилось примерно за полгода.`],
+  ['3 из 6',
+   `темы дали ровно ноль: Shopify, Steam и Statrum. Суммарно они стоили <b>${RUB(20000)}</b> — цена трёх проверенных гипотез.`],
+  ['×6,7',
+   `лучшая отдача — у УБТ: 3 000 ₽ превратились в 20 000 ₽ за три месяца. Но <b>объём маленький</b>, и тема не продолжилась.`],
+].map(([big,txt]) => `<div class="f"><div class="big">${big}</div><p>${txt}</p></div>`).join('');
+</script>
